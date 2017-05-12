@@ -23,7 +23,7 @@ object Boot extends App with MultipartFormDataHandler {
     case Failure(s) =>
       logger.error(s"Python is not installed here: ${config.getString("tom.pythonCmd")}")
       sys.exit(1)
-    case Success(info) => logger.info(s" Python succesfully installed ${config.getString("tom.pythonCmd")} ${info}")
+    case Success(info) => logger.info(s" Python succesfully installed :${config.getString("tom.pythonCmd")} ${info}")
   }
 
   Http().bindAndHandle(routes, config.getString("http.interface"), config.getInt("http.port")) map { result =>

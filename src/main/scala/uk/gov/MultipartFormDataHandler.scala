@@ -60,6 +60,8 @@ trait MultipartFormDataHandler extends Protocols {
           pw.close()
 
         val cmd = s"python3 ${pyHome} ${tmpFile.getAbsolutePath}"
+        println("running... ")
+        println(cmd)
         val resultr = (cmd !!)
         val r: List[ResultRow] = resultr.split(System.lineSeparator()).toList.map(row => ResultRow(row.split(",")(0), Option(row.split(",")(1).trim.toLong)))
         Result(req.filename, Some(System.currentTimeMillis()), r)
