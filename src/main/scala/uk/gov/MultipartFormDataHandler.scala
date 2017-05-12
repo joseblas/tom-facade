@@ -12,6 +12,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import akka.stream.scaladsl.FileIO
+import com.typesafe.config.ConfigFactory
 import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -43,7 +44,11 @@ trait MultipartFormDataHandler extends Protocols {
 
   val routes = processMultiPartData
 
-  def processMultiPartData: Route = path("upload") {
+  val config = ConfigFactory.load()
+
+  val pyHome = config.getString("tom.pythonHome")
+
+  def processMultiPartData: Route = path("GetEntities") {
     (post & entity(as[NlpRequest])) { req =>
       complete {
         val tmpFile = File.createTempFile("nlp", ".txt")
@@ -54,7 +59,7 @@ trait MultipartFormDataHandler extends Protocols {
         finally
           pw.close()
 
-        val cmd = s"python3 /Users/jta/bdec/tom/tom.py ${tmpFile.getAbsolutePath}"
+        val cmd = s"python3 ${pyHome} ${tmpFile.getAbsolutePath}"
         val resultr = (cmd !!)
         val r: List[ResultRow] = resultr.split(System.lineSeparator()).toList.map(row => ResultRow(row.split(",")(0), Option(row.split(",")(1).trim.toLong)))
         Result(req.filename, Some(System.currentTimeMillis()), r)
